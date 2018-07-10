@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"log"
 	"fmt"
@@ -10,6 +11,8 @@ import (
 	"os/signal"
 	"os/user"
 	"strings"
+
+	"github.com/eiannone/keyboard"
 )
 
 func main() {
@@ -26,7 +29,16 @@ func main() {
 	for {
 		/* Retrieve the primary info */
 		curruser, currhost, currdir := getUserHostandDir()
-		fmt.Print(curruser, "@", currhost, ":", currdir, "> ")
+		fmt.Print(curruser, "@", currhost, ":", currdir, "$ ")
+
+		/* Get the first key for further development */
+		char, key, err := keyboard.GetSingleKey()
+		if err != nil {
+			log.Fatal(err)
+		} else if key == keyboard.KeyArrowUp {
+			os.Exit(1)
+		}
+		fmt.Print(string(char))
 
 		/* Read the keyboard input */
 		input, err := reader.ReadString('\n')
@@ -34,8 +46,15 @@ func main() {
 			fmt.Fprintln(os.Stderr, err)
 		}
 
+		/* Append the first key with rest of the command */
+		list := []string{string(char), input}
+		var str bytes.Buffer
+		for _, value := range list {
+			str.WriteString(value)
+		}
+
 		/* Handle the execution of the input */
-		err = execInput(input)
+		err = execInput(str.String())
 		if err != nil {
 			fmt.Println(err)
 		}
