@@ -21,7 +21,7 @@ func main() {
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		<-c
-		fmt.Print("\n")
+		/* Silently exit the program */
 		os.Exit(0)
 	}()
 
