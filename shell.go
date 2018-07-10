@@ -25,8 +25,8 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		/* Retrieve the primary info */
-		curruser, currdir := getUserandDir()
-		fmt.Print(curruser, "@", currdir, "> ")
+		curruser, currhost, currdir := getUserHostandDir()
+		fmt.Print(curruser, "@", currhost, ":", currdir, "> ")
 
 		/* Read the keyboard input */
 		input, err := reader.ReadString('\n')
@@ -81,7 +81,7 @@ func execInput(input string) error {
 	return nil
 }
 
-func getUserandDir() (string, string) {
+func getUserHostandDir() (string, string, string) {
 	/* Get the logged in user */
 	user, err := user.Current()
 	if err != nil {
@@ -94,5 +94,11 @@ func getUserandDir() (string, string) {
 		log.Fatal(err)
 	}
 
-	return user.Username, dir
+	/* Get the Machine hostname */
+	name, err := os.Hostname()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return user.Username, name, dir
 }
